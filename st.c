@@ -2490,22 +2490,22 @@ csidump(void)
 	int i;
 	uint c;
 
-	printf("ESC[");
+	fprintf(stderr, "ESC[");
 	for (i = 0; i < csiescseq.len; i++) {
 		c = csiescseq.buf[i] & 0xff;
 		if (isprint(c)) {
-			putchar(c);
+			putc(c, stderr);
 		} else if (c == '\n') {
-			printf("(\\n)");
+			fprintf(stderr, "(\\n)");
 		} else if (c == '\r') {
-			printf("(\\r)");
+			fprintf(stderr, "(\\r)");
 		} else if (c == 0x1b) {
-			printf("(\\e)");
+			fprintf(stderr, "(\\e)");
 		} else {
-			printf("(%02x)", c);
+			fprintf(stderr, "(%02x)", c);
 		}
 	}
-	putchar('\n');
+	putc('\n', stderr);
 }
 
 void
@@ -2594,24 +2594,25 @@ strdump(void)
 	int i;
 	uint c;
 
-	printf("ESC%c", strescseq.type);
+	fprintf(stderr, "ESC%c", strescseq.type);
 	for (i = 0; i < strescseq.len; i++) {
 		c = strescseq.buf[i] & 0xff;
 		if (c == '\0') {
+			putc('\n', stderr);
 			return;
 		} else if (isprint(c)) {
-			putchar(c);
+			putc(c, stderr);
 		} else if (c == '\n') {
-			printf("(\\n)");
+			fprintf(stderr, "(\\n)");
 		} else if (c == '\r') {
-			printf("(\\r)");
+			fprintf(stderr, "(\\r)");
 		} else if (c == 0x1b) {
-			printf("(\\e)");
+			fprintf(stderr, "(\\e)");
 		} else {
-			printf("(%02x)", c);
+			fprintf(stderr, "(%02x)", c);
 		}
 	}
-	printf("ESC\\\n");
+	fprintf(stderr, "ESC\\\n");
 }
 
 void
@@ -3372,16 +3373,32 @@ xgeommasktogravity(int mask)
 int
 xloadfont(Font *f, FcPattern *pattern)
 {
+	FcPattern *configured;
 	FcPattern *match;
 	FcResult result;
 	XGlyphInfo extents;
 	int wantattr, haveattr;
 
-	match = XftFontMatch(xw.dpy, xw.scr, pattern, &result);
-	if (!match)
+	/*
+	 * Manually configure instead of calling XftMatchFont
+	 * so that we can use the configured pattern for
+	 * "missing glyph" lookups.
+	 */
+	configured = FcPatternDuplicate(pattern);
+	if (!configured)
 		return 1;
 
+	FcConfigSubstitute(NULL, configured, FcMatchPattern);
+	XftDefaultSubstitute(xw.dpy, xw.scr, configured);
+
+	match = FcFontMatch(NULL, configured, &result);
+	if (!match) {
+		FcPatternDestroy(configured);
+		return 1;
+	}
+
 	if (!(f->match = XftFontOpenPattern(xw.dpy, match))) {
+		FcPatternDestroy(configured);
 		FcPatternDestroy(match);
 		return 1;
 	}
@@ -3413,7 +3430,7 @@ xloadfont(Font *f, FcPattern *pattern)
 		strlen(ascii_printable), &extents);
 
 	f->set = NULL;
-	f->pattern = FcPatternDuplicate(pattern);
+	f->pattern = configured;
 
 	f->ascent = f->match->ascent;
 	f->descent = f->match->descent;
@@ -4454,8 +4471,6 @@ usage(void)
 int
 main(int argc, char *argv[])
 {
-	uint cols = 80, rows = 24;
-
 	xw.l = xw.t = 0;
 	xw.isfixed = False;
 	xw.cursor = cursorshape;
