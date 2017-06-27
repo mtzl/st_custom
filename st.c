@@ -1402,6 +1402,9 @@ tsetattr(int *attr, int l)
 		case 9:
 			term.c.attr.mode |= ATTR_STRUCK;
 			break;
+		case 21:
+			term.c.attr.mode &= ~ATTR_BOLD;
+			break;
 		case 22:
 			term.c.attr.mode &= ~(ATTR_BOLD | ATTR_FAINT);
 			break;
@@ -2537,7 +2540,7 @@ tresize(int col, int row)
 	}
 
 	/* allocate any new rows */
-	for (/* i == minrow */; i < row; i++) {
+	for (/* i = minrow */; i < row; i++) {
 		term.line[i] = xmalloc(col * sizeof(Glyph));
 		term.alt[i] = xmalloc(col * sizeof(Glyph));
 	}

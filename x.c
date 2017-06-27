@@ -1285,6 +1285,8 @@ xdrawcursor(void)
 	xdrawglyph(og, oldx, oldy);
 
 	g.u = term.line[term.c.y][term.c.x].u;
+	g.mode |= term.line[term.c.y][term.c.x].mode &
+	          (ATTR_BOLD | ATTR_ITALIC | ATTR_UNDERLINE | ATTR_STRUCK);
 
 	/*
 	 * Select the right color for the right mode.
