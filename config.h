@@ -5,8 +5,8 @@
  *
  * font: see http://freedesktop.org/software/fontconfig/fontconfig-user.html
  */
-static char font[] = "Roboto Mono:pixelsize=14:antialias=true:autohint=true";
-static int borderpx = 2;
+char font[] = "Roboto Mono:pixelsize=16:antialias=true:autohint=true";
+int borderpx = 2;
 
 /*
  * What program is execed by st depends of these precedence rules:
@@ -24,8 +24,8 @@ static char stty_args[] = "stty raw pass8 nl -echo -iexten -cstopb 38400";
 static char vtiden[] = "\033[?6c";
 
 /* Kerning / character bounding-box multipliers */
-static float cwscale = 1.0;
-static float chscale = 1.0;
+float cwscale = 1.0;
+float chscale = 1.0;
 
 /*
  * word delimiter string
@@ -35,26 +35,26 @@ static float chscale = 1.0;
 static char worddelimiters[] = " ";
 
 /* selection timeouts (in milliseconds) */
-static unsigned int doubleclicktimeout = 300;
-static unsigned int tripleclicktimeout = 600;
+unsigned int doubleclicktimeout = 300;
+unsigned int tripleclicktimeout = 600;
 
 /* alt screens */
-static int allowaltscreen = 1;
+int allowaltscreen = 1;
 
 /* frames per second st should at maximum draw to the screen */
-static unsigned int xfps = 120;
-static unsigned int actionfps = 30;
+unsigned int xfps = 120;
+unsigned int actionfps = 30;
 
 /*
  * blinking timeout (set to 0 to disable blinking) for the terminal blinking
  * attribute.
  */
-static unsigned int blinktimeout = 800;
+unsigned int blinktimeout = 800;
 
 /*
  * thickness of underline and bar cursors
  */
-static unsigned int cursorthickness = 2;
+unsigned int cursorthickness = 2;
 
 /*
  * bell volume. It must be a value between -100 and 100. Use 0 for disabling
@@ -63,41 +63,68 @@ static unsigned int cursorthickness = 2;
 static int bellvolume = 0;
 
 /* default TERM value */
-static char termname[] = "xterm-256color";
+char termname[] = "rxvt-256color";
 
-static unsigned int tabspaces = 8;
+/*
+ * spaces per tab
+ *
+ * When you are changing this value, don't forget to adapt the »it« value in
+ * the st.info and appropriately install the st.info in the environment where
+ * you use this st version.
+ *
+ *	it#$tabspaces,
+ *
+ * Secondly make sure your kernel is not expanding tabs. When running `stty
+ * -a` »tab0« should appear. You can tell the terminal to not expand tabs by
+ *  running following command:
+ *
+ *	stty tabs
+ */
+static unsigned int tabspaces = 4;
 
-static const char *colorname[] = {
-	"#000000",		/* 0: ANSI Color 0 */
-	"#c82828",		/* 1: ANSI Color 1 */
-	"#718c00",		/* 2: ANSI Color 2 */
-	"#eab700",		/* 3: ANSI Color 3 */
-	"#4171ae",		/* 4: ANSI Color 4 */
-	"#8959a8",		/* 5: ANSI Color 5 */
-	"#3e999f",		/* 6: ANSI Color 6 */
-	"#fffefe",		/* 7: ANSI Color 7 */
-	"#000000",		/* 8: ANSI Color 8 */
-	"#c82828",		/* 9: ANSI Color 9 */
-	"#708b00",		/* 10: ANSI Color 10 */
-	"#e9b600",		/* 11: ANSI Color 11 */
-	"#4170ae",		/* 12: ANSI Color 12 */
-	"#8958a7",		/* 13: ANSI Color 13 */
-	"#3d999f",		/* 14: ANSI Color 14 */
-	"#fffefe",		/* 15: ANSI Color 15 */
+/* Terminal colors (16 first used in escape sequence) */
+const char *colorname[] = {
+	/* Normal colors */
+	"#1d1f21", /*  0: Base 00 - Black   */
+	"#CC342B", /*  1: Base 08 - Red     */
+	"#198844", /*  2: Base 0B - Green   */
+	"#FBA922", /*  3: Base 0A - Yellow  */
+	"#3971ED", /*  4: Base 0D - Blue    */
+	"#A36AC7", /*  5: Base 0E - Magenta */
+	"#3971ED", /*  6: Base 0C - Cyan    */
+	"#c5c8c6", /*  7: Base 05 - White   */
+
+	/* Bright colors */
+	"#969896", /*  8: Base 03 - Bright Black */
+	"#CC342B", /*  9: Base 08 - Red          */
+	"#198844", /* 10: Base 0B - Green        */
+	"#FBA922", /* 11: Base 0A - Yellow       */
+	"#3971ED", /* 12: Base 0D - Blue         */
+	"#A36AC7", /* 13: Base 0E - Magenta      */
+	"#3971ED", /* 14: Base 0C - Cyan         */
+	"#ffffff", /* 15: Base 05 - Bright White */
+
+	/* A few more colors */
+
+	"#F96A38", /* 16: Base 09 */
+	"#3971ED", /* 17: Base 0F */
+	"#282a2e", /* 18: Base 01 */
+	"#373b41", /* 19: Base 02 */
+	"#b4b7b4", /* 20: Base 04 */
+	"#e0e0e0", /* 21: Base 06 */
+
 	[255] = 0,
-	[256] = "#ffffff",		/* 256: Background */
-	[257] = "#4d4d4c",		/* 257: Foreground */
-	[258] = "#4c4c4c",		/* 258: Cursor */
-	[259] = "#ffffff",		/* 259: Cursor Text */
-	/* No support for text highlight coloring; would be #4c4c4c. */
-	/* No support for highlight coloring; would be #d6d6d6. */
-	/* No support for bold coloring; would be #4c4c4c. */
+
+	[256] = "#373b41", /* default fg: Base 02 */
+	[257] = "#ffffff", /* default bg: Base 07 */
 };
 
-static unsigned int defaultfg  = 257;
-static unsigned int defaultbg  = 256;
-static unsigned int defaultcs  = 258;
-static unsigned int defaultrcs = 259;
+/* Foreground, background and cursor */
+unsigned int defaultfg = 256;
+unsigned int defaultbg = 257;
+unsigned int defaultcs = 256;
+unsigned int defaultrcs = 257;
+
 /*
  * Default shape of cursor
  * 2: Block ("█")
@@ -105,28 +132,33 @@ static unsigned int defaultrcs = 259;
  * 6: Bar ("|")
  * 7: Snowman ("☃")
  */
-static unsigned int cursorshape = 2;
+unsigned int cursorshape = 2;
+
+/*
+ * Default columns and rows numbers
+ */
+
+unsigned int cols = 80;
+unsigned int rows = 24;
 
 /*
  * Default colour and shape of the mouse cursor
  */
-static unsigned int mouseshape = XC_xterm;
-static unsigned int mousefg = 7;
-static unsigned int mousebg = 0;
+unsigned int mouseshape = XC_xterm;
+unsigned int mousefg = 7;
+unsigned int mousebg = 0;
 
 /*
- * Colors used, when the specific fg == defaultfg. So in reverse mode this
- * will reverse too. Another logic would only make the simple feature too
- * complex.
+ * Color used to display font attributes when fontconfig selected a font which
+ * doesn't match the ones requested.
  */
-static unsigned int defaultitalic = 11;
-static unsigned int defaultunderline = 7;
+unsigned int defaultattr = 11;
 
 /*
  * Internal mouse shortcuts.
  * Beware that overloading Button1 will disable the selection.
  */
-static MouseShortcut mshortcuts[] = {
+MouseShortcut mshortcuts[] = {
 	/* button               mask            string */
 	{ Button4,              XK_ANY_MOD,     "\031" },
 	{ Button5,              XK_ANY_MOD,     "\005" },
@@ -134,21 +166,22 @@ static MouseShortcut mshortcuts[] = {
 
 /* Internal keyboard shortcuts. */
 #define MODKEY Mod1Mask
+#define TERMMOD (ControlMask|ShiftMask)
 
-static Shortcut shortcuts[] = {
+Shortcut shortcuts[] = {
 	/* mask                 keysym          function        argument */
 	{ XK_ANY_MOD,           XK_Break,       sendbreak,      {.i =  0} },
 	{ ControlMask,          XK_Print,       toggleprinter,  {.i =  0} },
 	{ ShiftMask,            XK_Print,       printscreen,    {.i =  0} },
 	{ XK_ANY_MOD,           XK_Print,       printsel,       {.i =  0} },
-	{ MODKEY|ShiftMask,     XK_Prior,       xzoom,          {.f = +1} },
-	{ MODKEY|ShiftMask,     XK_Next,        xzoom,          {.f = -1} },
-	{ MODKEY|ShiftMask,     XK_Home,        xzoomreset,     {.f =  0} },
-	{ ShiftMask,            XK_Insert,      selpaste,       {.i =  0} },
-	{ MODKEY|ShiftMask,     XK_Insert,      clippaste,      {.i =  0} },
-	{ MODKEY|ShiftMask,     XK_C,           clipcopy,       {.i =  0} },
-	{ MODKEY|ShiftMask,     XK_V,           clippaste,      {.i =  0} },
-	{ MODKEY,               XK_Num_Lock,    numlock,        {.i =  0} },
+	{ TERMMOD,              XK_Prior,       zoom,           {.f = +1} },
+	{ TERMMOD,              XK_Next,        zoom,           {.f = -1} },
+	{ TERMMOD,              XK_Home,        zoomreset,      {.f =  0} },
+	{ TERMMOD,              XK_C,           clipcopy,       {.i =  0} },
+	{ TERMMOD,              XK_V,           clippaste,      {.i =  0} },
+	{ TERMMOD,              XK_Y,           selpaste,       {.i =  0} },
+	{ TERMMOD,              XK_Num_Lock,    numlock,        {.i =  0} },
+	{ TERMMOD,              XK_I,           iso14755,       {.i =  0} },
 };
 
 /*
@@ -193,7 +226,7 @@ static uint ignoremod = Mod2Mask|XK_SWITCH_MOD;
  * Note that if you want to use ShiftMask with selmasks, set this to an other
  * modifier, set to 0 to not use it.
  */
-static uint forceselmod = ShiftMask;
+uint forceselmod = ShiftMask;
 
 /*
  * This is the huge key array which defines all compatibility to the Linux
@@ -258,23 +291,39 @@ static Key key[] = {
 	{ XK_KP_8,          XK_ANY_MOD,     "\033Ox",       +2,    0,    0},
 	{ XK_KP_9,          XK_ANY_MOD,     "\033Oy",       +2,    0,    0},
 	{ XK_Up,            ShiftMask,      "\033[1;2A",     0,    0,    0},
-	{ XK_Up,            ControlMask,    "\033[1;5A",     0,    0,    0},
 	{ XK_Up,            Mod1Mask,       "\033[1;3A",     0,    0,    0},
+	{ XK_Up,         ShiftMask|Mod1Mask,"\033[1;4A",     0,    0,    0},
+	{ XK_Up,            ControlMask,    "\033[1;5A",     0,    0,    0},
+	{ XK_Up,      ShiftMask|ControlMask,"\033[1;6A",     0,    0,    0},
+	{ XK_Up,       ControlMask|Mod1Mask,"\033[1;7A",     0,    0,    0},
+	{ XK_Up,ShiftMask|ControlMask|Mod1Mask,"\033[1;8A",  0,    0,    0},
 	{ XK_Up,            XK_ANY_MOD,     "\033[A",        0,   -1,    0},
 	{ XK_Up,            XK_ANY_MOD,     "\033OA",        0,   +1,    0},
 	{ XK_Down,          ShiftMask,      "\033[1;2B",     0,    0,    0},
-	{ XK_Down,          ControlMask,    "\033[1;5B",     0,    0,    0},
 	{ XK_Down,          Mod1Mask,       "\033[1;3B",     0,    0,    0},
+	{ XK_Down,       ShiftMask|Mod1Mask,"\033[1;4B",     0,    0,    0},
+	{ XK_Down,          ControlMask,    "\033[1;5B",     0,    0,    0},
+	{ XK_Down,    ShiftMask|ControlMask,"\033[1;6B",     0,    0,    0},
+	{ XK_Down,     ControlMask|Mod1Mask,"\033[1;7B",     0,    0,    0},
+	{ XK_Down,ShiftMask|ControlMask|Mod1Mask,"\033[1;8B",0,    0,    0},
 	{ XK_Down,          XK_ANY_MOD,     "\033[B",        0,   -1,    0},
 	{ XK_Down,          XK_ANY_MOD,     "\033OB",        0,   +1,    0},
 	{ XK_Left,          ShiftMask,      "\033[1;2D",     0,    0,    0},
-	{ XK_Left,          ControlMask,    "\033[1;5D",     0,    0,    0},
 	{ XK_Left,          Mod1Mask,       "\033[1;3D",     0,    0,    0},
+	{ XK_Left,       ShiftMask|Mod1Mask,"\033[1;4D",     0,    0,    0},
+	{ XK_Left,          ControlMask,    "\033[1;5D",     0,    0,    0},
+	{ XK_Left,    ShiftMask|ControlMask,"\033[1;6D",     0,    0,    0},
+	{ XK_Left,     ControlMask|Mod1Mask,"\033[1;7D",     0,    0,    0},
+	{ XK_Left,ShiftMask|ControlMask|Mod1Mask,"\033[1;8D",0,    0,    0},
 	{ XK_Left,          XK_ANY_MOD,     "\033[D",        0,   -1,    0},
 	{ XK_Left,          XK_ANY_MOD,     "\033OD",        0,   +1,    0},
 	{ XK_Right,         ShiftMask,      "\033[1;2C",     0,    0,    0},
-	{ XK_Right,         ControlMask,    "\033[1;5C",     0,    0,    0},
 	{ XK_Right,         Mod1Mask,       "\033[1;3C",     0,    0,    0},
+	{ XK_Right,      ShiftMask|Mod1Mask,"\033[1;4C",     0,    0,    0},
+	{ XK_Right,         ControlMask,    "\033[1;5C",     0,    0,    0},
+	{ XK_Right,   ShiftMask|ControlMask,"\033[1;6C",     0,    0,    0},
+	{ XK_Right,    ControlMask|Mod1Mask,"\033[1;7C",     0,    0,    0},
+	{ XK_Right,ShiftMask|ControlMask|Mod1Mask,"\033[1;8C",0,   0,    0},
 	{ XK_Right,         XK_ANY_MOD,     "\033[C",        0,   -1,    0},
 	{ XK_Right,         XK_ANY_MOD,     "\033OC",        0,   +1,    0},
 	{ XK_ISO_Left_Tab,  ShiftMask,      "\033[Z",        0,    0,    0},
@@ -295,6 +344,7 @@ static Key key[] = {
 	{ XK_Delete,        XK_ANY_MOD,     "\033[P",       -1,    0,    0},
 	{ XK_Delete,        XK_ANY_MOD,     "\033[3~",      +1,    0,    0},
 	{ XK_BackSpace,     XK_NO_MOD,      "\177",          0,    0,    0},
+	{ XK_BackSpace,     Mod1Mask,       "\033\177",      0,    0,    0},
 	{ XK_Home,          ShiftMask,      "\033[2J",       0,   -1,    0},
 	{ XK_Home,          ShiftMask,      "\033[1;2H",     0,   +1,    0},
 	{ XK_Home,          XK_ANY_MOD,     "\033[H",        0,   -1,    0},
@@ -405,7 +455,7 @@ static Key key[] = {
  * ButtonRelease and MotionNotify.
  * If no match is found, regular selection is used.
  */
-static uint selmasks[] = {
+uint selmasks[] = {
 	[SEL_RECTANGULAR] = Mod1Mask,
 };
 
@@ -413,7 +463,7 @@ static uint selmasks[] = {
  * Printable characters in ASCII, used to estimate the advance width
  * of single wide characters.
  */
-static char ascii_printable[] =
+char ascii_printable[] =
 	" !\"#$%&'()*+,-./0123456789:;<=>?"
 	"@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_"
 	"`abcdefghijklmnopqrstuvwxyz{|}~";
